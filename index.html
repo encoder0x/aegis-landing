@@ -102,7 +102,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      background-attachment: fixed;
+      background-attachment: scroll; /* Changed from fixed - causes mobile crashes */
     }
     
     .background-container::after {
@@ -5428,7 +5428,14 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     });
 
     // Auto-advance carousel
-    let autoAdvanceInterval = setInterval(nextSlide, 8000);
+    // Disable auto-advance on mobile to prevent crashes
+    const isMobileCarousel = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                             (window.innerWidth <= 768) || 
+                             ('ontouchstart' in window);
+    let autoAdvanceInterval = null;
+    if (!isMobileCarousel) {
+      autoAdvanceInterval = setInterval(nextSlide, 8000);
+    }
 
     // Pause auto-advance on hover
     const carouselContainer = document.querySelector('.carousel-container');
@@ -5469,7 +5476,13 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
       }
     }
 
-    setInterval(updateHUD, 2000);
+    // Disable HUD updates on mobile to prevent crashes
+    const isMobileHUD = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                        (window.innerWidth <= 768) || 
+                        ('ontouchstart' in window);
+    if (!isMobileHUD) {
+      setInterval(updateHUD, 2000);
+    }
 
     // Tab Switching Functionality
     const navTabs = document.querySelectorAll('.nav-tab');
