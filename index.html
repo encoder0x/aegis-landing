@@ -2564,37 +2564,13 @@
         opacity: 0.5;
       }
 
-      /* Optionally hide 3D models on very low-end devices */
-      @media (max-width: 480px) and (max-height: 800px) {
-        #scanner-canvas,
-        #mantra-canvas,
-        #tech-drone-canvas,
-        #gate-military-canvas,
-        #gate-alice-canvas {
-          display: none !important;
-        }
-        
+      /* Completely hide 3D model containers on mobile */
+      @media (max-width: 768px) {
         .scanner-container,
         .mantra-model-container,
         .tech-drone-container,
         .gate-model-wrapper {
-          min-height: 200px;
-          background: rgba(0, 255, 255, 0.1);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .scanner-container::before,
-        .mantra-model-container::before,
-        .tech-drone-container::before,
-        .gate-model-wrapper::before {
-          content: '3D Model Disabled for Performance';
-          color: #00ffff;
-          font-family: 'Press Start 2P', monospace;
-          font-size: 8px;
-          text-align: center;
-          opacity: 0.7;
+          display: none !important;
         }
       }
     }
@@ -4227,26 +4203,12 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     
     // AGGRESSIVE: Completely disable 3D models on mobile to prevent crashes
     if (isMobile) {
+      // Simply hide all 3D containers on mobile - no placeholders
       const scannerCanvas = document.getElementById('scanner-canvas');
-      if (scannerCanvas) {
-        scannerCanvas.style.display = 'none';
-        const parent = scannerCanvas.parentElement;
-        if (parent) {
-          parent.style.minHeight = '200px';
-          parent.style.background = 'rgba(0, 255, 255, 0.1)';
-          parent.style.display = 'flex';
-          parent.style.alignItems = 'center';
-          parent.style.justifyContent = 'center';
-          const placeholder = document.createElement('div');
-          placeholder.textContent = '3D Model Disabled on Mobile';
-          placeholder.style.color = '#00ffff';
-          placeholder.style.fontFamily = "'Press Start 2P', monospace";
-          placeholder.style.fontSize = '8px';
-          placeholder.style.opacity = '0.7';
-          parent.appendChild(placeholder);
-        }
+      if (scannerCanvas && scannerCanvas.parentElement) {
+        scannerCanvas.parentElement.style.display = 'none';
       }
-      // Exit early - don't initialize any 3D on mobile (use return for module)
+      // Exit early - don't initialize any 3D on mobile
       // All code below this will be skipped on mobile
     } else {
       // DESKTOP ONLY: Initialize 3D models
@@ -4525,11 +4487,10 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     
     // AGGRESSIVE: Completely disable on mobile
     if (isMobileTech) {
+      // Simply hide container on mobile - no placeholders
       const techDroneCanvas = document.getElementById('tech-drone-canvas');
-      if (techDroneCanvas) {
-        techDroneCanvas.style.display = 'none';
-        techDroneCanvas.parentElement.style.minHeight = '200px';
-        techDroneCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      if (techDroneCanvas && techDroneCanvas.parentElement) {
+        techDroneCanvas.parentElement.style.display = 'none';
       }
       throw new Error('Mobile device - tech drone disabled');
     }
@@ -4819,11 +4780,10 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     
     // AGGRESSIVE: Completely disable on mobile
     if (isMobileMantra) {
+      // Simply hide container on mobile - no placeholders
       const mantraCanvas = document.getElementById('mantra-canvas');
-      if (mantraCanvas) {
-        mantraCanvas.style.display = 'none';
-        mantraCanvas.parentElement.style.minHeight = '200px';
-        mantraCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      if (mantraCanvas && mantraCanvas.parentElement) {
+        mantraCanvas.parentElement.style.display = 'none';
       }
       throw new Error('Mobile device - mantra disabled');
     }
@@ -5037,9 +4997,10 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     if (gateMilitaryCanvas) {
       // AGGRESSIVE: Completely disable on mobile
       if (isMobileGate) {
-        gateMilitaryCanvas.style.display = 'none';
-        gateMilitaryCanvas.parentElement.style.minHeight = '200px';
-        gateMilitaryCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+        // Simply hide container on mobile - no placeholders
+        if (gateMilitaryCanvas.parentElement) {
+          gateMilitaryCanvas.parentElement.style.display = 'none';
+        }
       } else {
         // Wait for tab to be visible before initializing
         const initGateMilitary = () => {
@@ -5235,9 +5196,10 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
                                  (window.innerWidth <= 768) || 
                                  ('ontouchstart' in window);
       if (isMobileGateAlice) {
-        gateAliceCanvas.style.display = 'none';
-        gateAliceCanvas.parentElement.style.minHeight = '200px';
-        gateAliceCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+        // Simply hide container on mobile - no placeholders
+        if (gateAliceCanvas.parentElement) {
+          gateAliceCanvas.parentElement.style.display = 'none';
+        }
       } else {
         // Wait for tab to be visible before initializing
         const initGateAlice = () => {
