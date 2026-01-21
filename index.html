@@ -2556,12 +2556,26 @@
 
       /* Background adjustments for mobile */
       .background-container {
-        background-attachment: scroll; /* Better performance on mobile */
+        background-attachment: scroll !important; /* Better performance on mobile */
+        position: relative !important; /* Prevent fixed positioning issues */
+      }
+      
+      /* Disable all heavy animations on mobile to prevent scroll crashes */
+      * {
+        animation-duration: 0.01s !important;
+        transition-duration: 0.01s !important;
+      }
+      
+      /* Keep essential animations but make them instant */
+      .glitch,
+      .hero h1::before,
+      .hero h1::after {
+        animation: none !important;
       }
 
-      /* Space particles - reduce on mobile for performance */
+      /* Space particles - completely disable on mobile */
       .space-particles-canvas {
-        opacity: 0.5;
+        display: none !important;
       }
 
       /* Completely hide 3D model containers on mobile */
