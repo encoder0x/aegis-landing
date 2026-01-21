@@ -4225,15 +4225,41 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
                      (window.innerWidth <= 768) || 
                      ('ontouchstart' in window);
     
-    // Limit pixel ratio on mobile to prevent crashes
-    const maxPixelRatio = isMobile ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio;
-    
-    // Disable heavy features on mobile
-    const enableShadows = !isMobile;
-    const enableAntialiasing = !isMobile;
-    const shadowMapSize = isMobile ? 512 : 2048;
-    
-    console.log('Mobile detected:', isMobile, 'Pixel ratio:', maxPixelRatio);
+    // AGGRESSIVE: Completely disable 3D models on mobile to prevent crashes
+    if (isMobile) {
+      const scannerCanvas = document.getElementById('scanner-canvas');
+      if (scannerCanvas) {
+        scannerCanvas.style.display = 'none';
+        const parent = scannerCanvas.parentElement;
+        if (parent) {
+          parent.style.minHeight = '200px';
+          parent.style.background = 'rgba(0, 255, 255, 0.1)';
+          parent.style.display = 'flex';
+          parent.style.alignItems = 'center';
+          parent.style.justifyContent = 'center';
+          const placeholder = document.createElement('div');
+          placeholder.textContent = '3D Model Disabled on Mobile';
+          placeholder.style.color = '#00ffff';
+          placeholder.style.fontFamily = "'Press Start 2P', monospace";
+          placeholder.style.fontSize = '8px';
+          placeholder.style.opacity = '0.7';
+          parent.appendChild(placeholder);
+        }
+      }
+      // Exit early - don't initialize any 3D on mobile (use return for module)
+      // All code below this will be skipped on mobile
+    } else {
+      // DESKTOP ONLY: Initialize 3D models
+      
+      // Limit pixel ratio on desktop
+      const maxPixelRatio = window.devicePixelRatio;
+      
+      // Enable all features on desktop
+      const enableShadows = true;
+      const enableAntialiasing = true;
+      const shadowMapSize = 2048;
+      
+      console.log('Desktop detected - initializing 3D models');
 
     // 3D Scanner Setup
     const canvas = document.getElementById('scanner-canvas');
@@ -4254,7 +4280,7 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
       canvas: canvas,
       antialias: enableAntialiasing,
       alpha: true,
-      powerPreference: isMobile ? "low-power" : "high-performance"
+      powerPreference: "high-performance"
     });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(maxPixelRatio);
@@ -4482,8 +4508,9 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     }
 
-    window.addEventListener('resize', onWindowResize);
-    animate();
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    } // End else block - desktop 3D only
   </script>
 
   <script type="module">
@@ -4495,6 +4522,18 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     const isMobileTech = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                          (window.innerWidth <= 768) || 
                          ('ontouchstart' in window);
+    
+    // AGGRESSIVE: Completely disable on mobile
+    if (isMobileTech) {
+      const techDroneCanvas = document.getElementById('tech-drone-canvas');
+      if (techDroneCanvas) {
+        techDroneCanvas.style.display = 'none';
+        techDroneCanvas.parentElement.style.minHeight = '200px';
+        techDroneCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      }
+      throw new Error('Mobile device - tech drone disabled');
+    }
+    
     const maxPixelRatioTech = isMobileTech ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio;
     const enableShadowsTech = !isMobileTech;
     const enableAntialiasingTech = !isMobileTech;
@@ -4720,6 +4759,7 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     let techDroneTime = 0;
 
     function animateTechDrone() {
+      if (isMobileTech) return; // Skip on mobile
       requestAnimationFrame(animateTechDrone);
       techDroneTime += 0.01;
 
@@ -4776,6 +4816,18 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     const isMobileMantra = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                             (window.innerWidth <= 768) || 
                             ('ontouchstart' in window);
+    
+    // AGGRESSIVE: Completely disable on mobile
+    if (isMobileMantra) {
+      const mantraCanvas = document.getElementById('mantra-canvas');
+      if (mantraCanvas) {
+        mantraCanvas.style.display = 'none';
+        mantraCanvas.parentElement.style.minHeight = '200px';
+        mantraCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      }
+      throw new Error('Mobile device - mantra disabled');
+    }
+    
     const maxPixelRatioMantra = isMobileMantra ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio;
     const enableShadowsMantra = !isMobileMantra;
     const enableAntialiasingMantra = !isMobileMantra;
@@ -4929,6 +4981,7 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     // Mantra Animation
     let mantraTime = 0;
     function animateMantra() {
+      if (isMobileMantra) return; // Skip on mobile
       requestAnimationFrame(animateMantra);
       mantraTime += 0.01;
 
@@ -4982,21 +5035,21 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     // Gate Military Drone (Left) Setup
     const gateMilitaryCanvas = document.getElementById('gate-military-canvas');
     if (gateMilitaryCanvas) {
-      // Wait for tab to be visible before initializing
-      const initGateMilitary = () => {
-        if (gateMilitaryCanvas.offsetWidth === 0 || gateMilitaryCanvas.offsetHeight === 0) {
-          // Canvas not visible yet, try again
-          setTimeout(initGateMilitary, 100);
-          return;
-        }
-        
-        // Skip 3D on very low-end mobile devices
-        if (isMobileGate && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
-          console.log('Skipping gate military model on low-end device');
-          return;
-        }
-        
-        try {
+      // AGGRESSIVE: Completely disable on mobile
+      if (isMobileGate) {
+        gateMilitaryCanvas.style.display = 'none';
+        gateMilitaryCanvas.parentElement.style.minHeight = '200px';
+        gateMilitaryCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      } else {
+        // Wait for tab to be visible before initializing
+        const initGateMilitary = () => {
+          if (gateMilitaryCanvas.offsetWidth === 0 || gateMilitaryCanvas.offsetHeight === 0) {
+            // Canvas not visible yet, try again
+            setTimeout(initGateMilitary, 100);
+            return;
+          }
+          
+          try {
           const gateMilitaryScene = new THREE.Scene();
           gateMilitaryScene.background = null; // Transparent to show blurred content behind
           gateMilitaryScene.fog = null; // Remove fog for cleaner look
@@ -5117,6 +5170,7 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
 
         let gateMilitaryTime = 0;
         function animateGateMilitary() {
+          if (isMobileGate) return; // Skip on mobile
           requestAnimationFrame(animateGateMilitary);
           gateMilitaryTime += 0.01;
 
@@ -5176,24 +5230,24 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
     // Gate Alice (Right) Setup - reuse mobile detection from gate military
     const gateAliceCanvas = document.getElementById('gate-alice-canvas');
     if (gateAliceCanvas) {
-      // Wait for tab to be visible before initializing
-      const initGateAlice = () => {
-        if (gateAliceCanvas.offsetWidth === 0 || gateAliceCanvas.offsetHeight === 0) {
-          // Canvas not visible yet, try again
-          setTimeout(initGateAlice, 100);
-          return;
-        }
-        
-        // Skip 3D on very low-end mobile devices
-        const isMobileGateAlice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                                   (window.innerWidth <= 768) || 
-                                   ('ontouchstart' in window);
-        if (isMobileGateAlice && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
-          console.log('Skipping gate alice model on low-end device');
-          return;
-        }
-        
-        try {
+      // AGGRESSIVE: Completely disable on mobile
+      const isMobileGateAlice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                                 (window.innerWidth <= 768) || 
+                                 ('ontouchstart' in window);
+      if (isMobileGateAlice) {
+        gateAliceCanvas.style.display = 'none';
+        gateAliceCanvas.parentElement.style.minHeight = '200px';
+        gateAliceCanvas.parentElement.style.background = 'rgba(0, 255, 255, 0.1)';
+      } else {
+        // Wait for tab to be visible before initializing
+        const initGateAlice = () => {
+          if (gateAliceCanvas.offsetWidth === 0 || gateAliceCanvas.offsetHeight === 0) {
+            // Canvas not visible yet, try again
+            setTimeout(initGateAlice, 100);
+            return;
+          }
+          
+          try {
           const gateAliceScene = new THREE.Scene();
           gateAliceScene.background = null; // Transparent to show blurred content behind
           gateAliceScene.fog = null; // Remove fog for cleaner look
@@ -5482,6 +5536,19 @@ const score = triggeredRules.reduce((sum, rule) => {<br>
   <script>
     // Space Particle System with Pulsating Stars and Mouse-Following Clusters
     (function() {
+      // COMPLETELY DISABLE ON MOBILE - too heavy
+      const isMobileParticles = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                                 (window.innerWidth <= 768) || 
+                                 ('ontouchstart' in window);
+      
+      if (isMobileParticles) {
+        const canvas = document.getElementById('space-particles-canvas');
+        if (canvas) {
+          canvas.style.display = 'none';
+        }
+        return; // Exit early on mobile
+      }
+      
       const canvas = document.getElementById('space-particles-canvas');
       if (!canvas) return;
       
